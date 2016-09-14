@@ -1,24 +1,24 @@
-;; The sum of the primes below 10 is 2 + 3 + 5 + 7 = 17.
+;; A Pythagorean triplet is a set of three natural numbers, a < b < c, for which,
 
-;; Find the sum of all the primes below two million.
+;; a^2 + b^2 = c^2
+;; For example, 3^2 + 4^2 = 9 + 16 = 25 = 5^2.
 
-(defn prime?
-  [n]
-  {:pre [(integer? n) (> n 0)]}
-  (or (== 2 n)
-      (let [mmax (+ (Math/sqrt n) 1)]
-        (not (some #(== 0 (rem n %)) (concat [2] (range 3 mmax 2))))
-        )))
-
-(defn lz-primes
-  []
-  (concat [2]
-          (filter prime? (iterate #(+ 2 %) 3))))
+;; There exists exactly one Pythagorean triplet for which a + b + c = 1000.
+;; Find the product abc.
 
 
-(reduce + (take-while #(< % 2000000) (lz-primes)))
+(defn pythagorean-triplet
+  [s]
+  (->> (for [a (range 1       (+ 1 (int (/ s 3))))
+             b (range (+ 1 a) (+ 1 (int (/ s 2))))
+             c (range (+ 1 b) s)]
+         [a b c])
+       (filter (fn [[a b c]] (== (+ (* a a) (* b b)) (* c c))))
+       (filter #(== s (apply + %)))
+       ))
 
-;;-> 142913828922
+(apply * (first (pythagorean-triplet 1000)))
 
+;;-> 31875000
 
 
