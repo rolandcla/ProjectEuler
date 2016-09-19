@@ -33,34 +33,36 @@
   )
 
 (defn search-for-n-digits-cycle
-  [decs n from]
-  (let [len (+ 10 (* 3 n))
-        ds (take len decs)]
-    (loop [from from]
-      (when (< from len)
-        (let [p (partition n (drop from ds))]
-          (if (and (> (count p) 1) (apply = p))
-            [(take from ds) (take n (drop from ds))]
-            (recur (inc from))
-            )))))
-  )
+  [decs n]
+  (let [n-cy 4
+        farthest-cy 20
+        ]
+    (loop [from 0]
+      (when (< from farthest-cy)
+        (let [p (partition n (take (* n-cy n) (drop from decs)))]
+          (if (= (count p) n-cy)
+            (if (apply = p)
+              [(take from decs) (first p)]
+              (recur (inc from)))
+            [decs nil]
+            ))))))
+
+
+
 
 (defn search-for-shortest-cycle
   [ds]
   (loop [n 1]
-    (when (< n 100)
-      (or (search-for-n-digits-cycle ds n 0)
-          (recur (inc n)))
-      )
+    (or (search-for-n-digits-cycle ds n)
+        (recur (inc n)))
     )
-    
   )
 
-(defn solution []
-  (->> (range 2 100)
+(defn solution [n]
+  (->> (range 2 n)
        (map #(vector % (decimals %)))
        (map (fn [[ix ds]] [ix (search-for-shortest-cycle ds)]))
-       ;;(map (fn [[ix ds]] [ix (take 20 ds)]))
-
+       (map (fn [[ix [prefix cy]]] [ix (count cy)]))
+       (sort-by (fn [[ix n]] n))
        ))
 
