@@ -16,6 +16,10 @@
 ;; Find the value of d < 1000 for which 1/d contains
 ;; the longest recurring cycle in its decimal fraction part.
 
+;;==========================================================================
+
+;; Naive solution
+;;--------------------------------------------------------------------------
 
 (defn decimals
   [x]
@@ -65,4 +69,27 @@
        (map (fn [[ix [prefix cy]]] [ix (count cy)]))
        (sort-by (fn [[ix n]] n))
        ))
+
+;; Best solution - 7000 times faster :)
+;; -------------------------------------------------------------
+
+(defn length-of-recurring-cycle
+  [n]
+  (loop [ix 0, rest 10, seen {}]
+    (let [prev-rest-ix (seen rest)]
+      (cond (== 0 rest)          0
+            (nil? prev-rest-ix)  (recur (inc ix) (* 10 (rem rest n)) (assoc seen rest ix))
+            :else                (- ix prev-rest-ix)
+            ))))
+
+(defn solution [n]
+  (->> (range 2 n)
+       (map #(vector (length-of-recurring-cycle %) %))
+       (reduce #(if (> (first %2) (first %1)) %2 %1))
+       ))
+
+(solution 1000)
+
+;;-> [982 983]
+;;        ---
 
